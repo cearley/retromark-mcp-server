@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.0] - 2025-11-26
+## [Unreleased]
 
 ### Added - Universal MCP Client Support
 - **Claude Desktop & Claude Code support** (Primary)
@@ -74,7 +74,7 @@
 ### Added
 - Chrome bookmark integration
   - Support for listing Chrome bookmarks across all profiles
-  - Import Chrome bookmarks into Retromark
+  - Import Chrome bookmarks into LinkVault
   - Filter bookmarks by folder path
   - Cross-platform support (macOS, Windows, Linux)
 
@@ -97,7 +97,7 @@
 ## [1.0.0] - 2025-05-28
 
 ### Added
-- Initial release of Retromark MCP Server (originally LinkVault)
+- Initial release of LinkVault MCP Server
 - CLI interface with JSON storage
 - MCP server with SQLite storage
 - Content extraction from web pages
