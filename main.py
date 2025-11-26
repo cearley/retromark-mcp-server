@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-Retromark MCP Server - Main entry point
+Retromark - Universal MCP Server for Bookmark Management
+
+Main entry point supporting two modes:
+- MCP mode: Runs as an MCP server for AI assistants (Claude, Continue.dev, Amazon Q, etc.)
+- CLI mode: Standalone command-line bookmark management interface
 """
 
 import os
@@ -11,7 +15,14 @@ import argparse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 def start_mcp_server():
-    """Start the MCP server for bookmark management."""
+    """Start the MCP server for AI-assisted bookmark management.
+
+    The server can be used with any MCP-compatible client including:
+    - Claude Desktop
+    - Claude Code
+    - Continue.dev (VS Code/JetBrains)
+    - Amazon Q CLI
+    """
     from src.server import app
     print("Starting Retromark MCP Server...")
     app.run()
@@ -23,9 +34,9 @@ def start_cli():
 
 def main():
     """Main entry point for the Retromark MCP Server."""
-    parser = argparse.ArgumentParser(description="Retromark MCP Server")
+    parser = argparse.ArgumentParser(description="Retromark - Universal MCP Server for Bookmark Management")
     parser.add_argument("--mode", choices=["cli", "mcp"], default="cli",
-                        help="Mode to run (cli or mcp)")
+                        help="Mode to run: 'mcp' for MCP server (Claude/Continue.dev/Amazon Q), 'cli' for standalone CLI")
     
     args = parser.parse_args()
     

@@ -2,8 +2,9 @@
 """
 Retromark MCP Server
 
-This is an MCP server for bookmark management.
-It provides tools for URL content extraction and bookmark storage.
+A universal MCP server for AI-assisted bookmark management.
+Provides tools for URL content extraction, bookmark storage, and Chrome bookmark integration.
+Compatible with Claude Desktop, Claude Code, Continue.dev, Amazon Q CLI, and other MCP clients.
 """
 
 import os
@@ -80,7 +81,7 @@ def init_db():
 init_db()
 
 # Create MCP server
-app = FastMCP(name="bookmark_manager", description="Retromark - A tool for managing bookmarks")
+app = FastMCP(name="bookmark_manager", description="Retromark - Universal MCP server for AI-assisted bookmark management")
 
 @app.tool("get_url_data")
 def get_url_data(url: str) -> Dict[str, Any]:

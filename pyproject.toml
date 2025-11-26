@@ -1,9 +1,10 @@
 [project]
 name = "retromark-mcp-server"
-version = "0.1.0"
-description = "A tool for managing, categorizing, and searching web URLs with both CLI and AI-assisted interfaces"
+version = "0.2.0"
+description = "Universal MCP server for AI-assisted bookmark management. Works with Claude Desktop, Claude Code, Continue.dev, Amazon Q CLI, and other MCP clients."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
+keywords = ["mcp", "claude", "continue", "bookmark-manager", "ai-assistant", "ide", "vscode", "mcp-server"]
 dependencies = [
     "beautifulsoup4>=4.13.4",
     "fastapi>=0.115.12",

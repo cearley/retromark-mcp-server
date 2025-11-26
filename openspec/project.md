@@ -2,14 +2,15 @@
 
 ## Purpose
 
-Retromark is an MCP (Model Context Protocol) server that provides AI-assisted bookmark management through Amazon Q CLI. The project enables users to manage, categorize, and search bookmarks using natural language in their terminal, with automatic webpage content extraction and AI-assisted organization.
+Retromark is a universal MCP (Model Context Protocol) server that provides AI-assisted bookmark management for any MCP-compatible client. The project enables users to manage, categorize, and search bookmarks using natural language through their preferred AI assistant or IDE, with automatic webpage content extraction and AI-assisted organization.
 
 **Key Goals:**
-- Seamless integration with Amazon Q CLI for natural language bookmark management
+- Universal MCP server supporting Claude Desktop, Claude Code, Continue.dev, Amazon Q CLI, and other MCP clients
 - Multi-profile Chrome bookmark access and import capabilities
 - Automatic webpage metadata extraction and content analysis
 - Cross-platform support (macOS, Windows, Linux)
 - Dual operational modes: MCP server (AI-assisted) and standalone CLI
+- Three distinct use cases: Desktop AI chat, IDE integration, and terminal workflows
 
 ## Tech Stack
 
@@ -185,23 +186,69 @@ The SQLite schema includes dynamic migration logic (e.g., adding `notes` column 
 
 ## External Dependencies
 
-### Amazon Q CLI
+### MCP Clients
 
-The primary integration point. Retromark is configured in Amazon Q's MCP configuration file (`~/.aws/amazonq/mcp.json`) to enable natural language bookmark management.
+Retromark works with any MCP-compatible client. Below are the tested and documented clients:
 
-Configuration example:
+#### Claude Desktop (Primary)
+
+Configuration file: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
+
+Example configuration:
 ```json
-"bookmark_manager": {
-  "command": "uv",
-  "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"],
-  "env": {},
-  "disabled": false,
-  "autoApprove": ["get_url_data", "store_url", "search_bookmarks",
-                  "list_categories", "list_bookmarks_by_category",
-                  "delete_bookmark", "list_chrome_bookmarks",
-                  "import_chrome_bookmark"]
+{
+  "mcpServers": {
+    "retromark": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"]
+    }
+  }
 }
 ```
+
+**Use case**: General-purpose AI chat and assistance with bookmark management.
+
+#### Continue.dev (Secondary)
+
+Configuration file: `~/.continue/config.json` or `~/.continue/mcpServers/retromark.yaml`
+
+Example JSON configuration:
+```json
+{
+  "mcpServers": {
+    "retromark": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"]
+    }
+  }
+}
+```
+
+**Use case**: IDE-integrated bookmark management while coding (VS Code/JetBrains). Access via @ menu in Continue.dev.
+
+**Features**: First client with full MCP support (Resources, Prompts, Tools, Sampling). Supports both JSON and YAML config formats.
+
+#### Amazon Q CLI (Tertiary)
+
+Configuration file: `~/.aws/amazonq/mcp.json`
+
+Example configuration:
+```json
+{
+  "bookmark_manager": {
+    "command": "uv",
+    "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"],
+    "env": {},
+    "disabled": false,
+    "autoApprove": ["get_url_data", "store_url", "search_bookmarks",
+                    "list_categories", "list_bookmarks_by_category",
+                    "delete_bookmark", "list_chrome_bookmarks",
+                    "import_chrome_bookmark"]
+  }
+}
+```
+
+**Use case**: Terminal-based workflows and AWS-focused development.
 
 ### Google Chrome
 
@@ -219,4 +266,5 @@ HTTP requests to arbitrary websites for content extraction. Requires:
 - Previously named "LinkVault", rebranded to "Retromark"
 - Initial focus: Personal bookmark management CLI
 - Evolution: Added MCP server capabilities for Amazon Q CLI integration
-- Current state: Dual-mode operation (MCP server + standalone CLI)
+- **v0.2.0**: Repositioned as universal MCP server supporting Claude Desktop, Claude Code, Continue.dev, Amazon Q CLI, and other MCP clients
+- Current state: Dual-mode operation (MCP server + standalone CLI) with multi-client support

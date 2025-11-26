@@ -1,406 +1,322 @@
 # Retromark MCP Server
 
-A tool for extending Amazon Q CLI with AI-assisted bookmark management capabilities.
+**Universal MCP server for AI-assisted bookmark management**
+
+Retromark works with Claude Desktop, Claude Code, Continue.dev, Amazon Q CLI, and any other MCP-compatible client.
+
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Python](https://img.shields.io/badge/python-3.10+-green)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Overview
 
-Retromark is an MCP (Model Context Protocol) server that integrates with Amazon Q CLI to provide intelligent bookmark management through natural language. It allows you to access, organize, and search your bookmarks using conversational commands in your terminal.
+Retromark is an MCP (Model Context Protocol) server that provides intelligent bookmark management through AI assistants. Save, organize, and search bookmarks using natural language, whether you're in your IDE, terminal, or desktop chat application.
 
-## Key Features
+### Key Features
 
-- **Amazon Q CLI Integration**: Manage bookmarks using natural language in your terminal
-- **Chrome Multi-Profile Support**: Access bookmarks from all your Chrome profiles
-- **Content Extraction**: Automatically analyze webpage content for better categorization
-- **Intelligent Organization**: AI-assisted categorization and tagging
-- **Cross-Platform**: Works on macOS, Windows, and Linux
+- **Universal MCP Support**: Works with any MCP-compatible client
+- **Intelligent Content Extraction**: Automatically analyzes and categorizes web pages
+- **Chrome Integration**: Import bookmarks from all Chrome profiles
+- **Natural Language Interface**: Conversational bookmark management
+- **Cross-Platform**: macOS, Windows, and Linux support
+- **Dual Mode**: MCP server or standalone CLI
 
-## Installation
+## Quick Start
 
-### Prerequisites
+### Installation
 
-- Python 3.10+ (Python 3.13 recommended)
-- [uv](https://docs.astral.sh/uv/) (recommended) or pip
+```bash
+# Install uv (recommended package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-### Using uv (Recommended)
+# Clone and install
+git clone https://github.com/cearley/retromark-mcp-server.git
+cd retromark-mcp-server
+uv sync
+chmod +x main.py src/url_manager.py src/server.py
+```
 
-1. Install uv if you haven't already:
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
+### Choose Your Client
 
-2. Clone the repository and install dependencies:
-   ```bash
-   git clone https://github.com/cearley/retromark-mcp-server.git
-   cd retromark-mcp-server
-   uv sync
-   ```
+Retromark supports multiple MCP clients. Choose the one that fits your workflow:
 
-3. Make the scripts executable:
-   ```bash
-   chmod +x main.py src/url_manager.py src/server.py
-   ```
+| Client | Best For | Setup Guide |
+|--------|----------|-------------|
+| **Claude Desktop** | General AI chat & research | [Claude Setup](docs/claude-setup.md) |
+| **Continue.dev** | IDE integration (VS Code/JetBrains) | [Continue.dev Setup](docs/continue-setup.md) |
+| **Amazon Q CLI** | Terminal workflows & AWS development | [Amazon Q Setup](docs/amazonq-setup.md) |
 
-### Using pip (Alternative)
+**Not sure which to choose?** See the [Client Comparison Guide](docs/client-comparison.md).
 
-1. Make sure you have Python 3.10+ installed
+## Supported MCP Clients
 
-2. Install required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Claude Desktop & Claude Code (Primary)
 
-3. Make the scripts executable:
-   ```bash
-   chmod +x main.py src/url_manager.py src/server.py
-   ```
+**Use Case**: Desktop AI chat, general research, content curation
 
-## Amazon Q CLI Setup
+**Configuration**: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
-To use Retromark with Amazon Q CLI, you need to register it as an MCP server:
+```json
+{
+  "mcpServers": {
+    "retromark": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"]
+    }
+  }
+}
+```
 
-1. Edit the MCP configuration file:
-   ```
-   nano ~/.aws/amazonq/mcp.json
-   ```
+**[Full Claude Setup Guide →](docs/claude-setup.md)**
 
-2. Add the bookmark_manager configuration:
-   ```json
-   "bookmark_manager": {
-     "command": "uv",
-     "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"],
-     "env": {},
-     "disabled": false,
-     "autoApprove": ["get_url_data", "store_url", "search_bookmarks", "list_categories", "list_bookmarks_by_category", "delete_bookmark", "list_chrome_bookmarks", "import_chrome_bookmark"]
-   }
-   ```
+### Continue.dev (Secondary)
 
-3. Replace `/path/to/retromark-mcp-server` with the actual path to your installation directory.
+**Use Case**: IDE-integrated bookmark management while coding
 
-4. Save the file and restart Amazon Q CLI if it's already running.
+**Configuration**: `~/.continue/config.json`
 
-## MCP Architecture
+```json
+{
+  "mcpServers": {
+    "retromark": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"]
+    }
+  }
+}
+```
 
-Retromark uses the Model Context Protocol to extend Amazon Q CLI with bookmark management capabilities:
+Access via `@` menu in Continue.dev. First MCP client with full support for Resources, Prompts, Tools, and Sampling.
+
+**[Full Continue.dev Setup Guide →](docs/continue-setup.md)**
+
+### Amazon Q CLI (Tertiary)
+
+**Use Case**: Terminal-based workflows, AWS development, scripting
+
+**Configuration**: `~/.aws/amazonq/mcp.json`
+
+```json
+{
+  "bookmark_manager": {
+    "command": "uv",
+    "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"],
+    "disabled": false,
+    "autoApprove": ["get_url_data", "store_url", "search_bookmarks",
+                    "list_categories", "list_bookmarks_by_category",
+                    "delete_bookmark", "list_chrome_bookmarks",
+                    "import_chrome_bookmark"]
+  }
+}
+```
+
+**[Full Amazon Q Setup Guide →](docs/amazonq-setup.md)**
+
+## Architecture
 
 ```mermaid
 graph TD
-    User[User] -->|Natural Language| AQ[Amazon Q CLI]
-    AQ -->|MCP Protocol| MCP[Retromark MCP Server]
-    MCP -->|SQLite Storage| SQL[(SQLite Database)]
-    MCP -->|Extract Content| Web[Web Pages]
-    MCP -->|Read Bookmarks| Chrome[Chrome Profiles]
+    User[User] -->|Interacts with| Client[MCP Client]
+    Client -->|Claude Desktop| Retromark[Retromark MCP Server]
+    Client -->|Continue.dev| Retromark
+    Client -->|Amazon Q CLI| Retromark
+    Client -->|Other MCP Clients| Retromark
 
-    subgraph Retromark
-        MCP
-    end
+    Retromark -->|Store/Retrieve| DB[(SQLite Database)]
+    Retromark -->|Fetch Content| Web[Websites]
+    Retromark -->|Read Bookmarks| Chrome[Chrome Profiles]
+
+    style Retromark fill:#4CAF50
+    style Client fill:#2196F3
 ```
 
-## MCP Workflow
+## Example Workflows
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant AQ as Amazon Q CLI
-    participant MCP as Retromark MCP Server
-    participant Web as Web Pages
-    participant DB as SQLite Database
-    participant Chrome as Chrome Bookmarks
-    
-    User->>AQ: "Save this article: https://example.com"
-    AQ->>MCP: get_url_data(url)
-    MCP->>Web: Fetch content
-    Web-->>MCP: HTML content
-    MCP-->>AQ: URL metadata
-    AQ->>User: "I found this article about X. Save it?"
-    User->>AQ: "Yes, save it"
-    AQ->>MCP: store_url(metadata)
-    MCP->>DB: Store bookmark
-    DB-->>MCP: Success
-    MCP-->>AQ: Success response
-    AQ->>User: "Bookmark saved!"
-    
-    User->>AQ: "Show my Chrome bookmarks"
-    AQ->>MCP: list_chrome_bookmarks()
-    MCP->>Chrome: Read bookmarks
-    Chrome-->>MCP: Bookmark data
-    MCP-->>AQ: Chrome bookmarks
-    AQ->>User: "Here are your Chrome bookmarks..."
-```
-
-## Browser Integration
-
-Retromark can access bookmarks from all Chrome profiles on your system:
-
-```mermaid
-flowchart TD
-    start[Start] --> findProfiles[Find Chrome Profiles]
-    findProfiles --> profileCheck{Profiles Found?}
-    profileCheck -->|No| returnEmpty[Return Empty List]
-    profileCheck -->|Yes| loopProfiles[Process Each Profile]
-    loopProfiles --> parseBookmarks[Parse Bookmark File]
-    parseBookmarks --> extractData[Extract Bookmark Data]
-    extractData --> addProfileInfo[Add Profile Information]
-    addProfileInfo --> combineResults[Combine Results]
-    combineResults --> filterCheck{Filter by Folder?}
-    filterCheck -->|Yes| applyFilter[Apply Folder Filter]
-    filterCheck -->|No| returnAll[Return All Bookmarks]
-    applyFilter --> returnFiltered[Return Filtered Bookmarks]
-    returnEmpty --> endNode[End]
-    returnAll --> endNode
-    returnFiltered --> endNode
-```
-
-## Example Interactions with Amazon Q CLI
+### With Claude Desktop
 
 ```
+You: Save this Python asyncio guide: https://docs.python.org/3/library/asyncio.html
+
+Claude: I'll analyze and save that for you...
+
+[Analyzes content]
+
+Saved!
+- Title: asyncio — Asynchronous I/O
+- Category: Programming
+- Tags: python, asyncio, concurrent-programming
+- Importance: 4
+```
+
+### With Continue.dev
+
+```
+# In VS Code while coding
+
+You: @MCP Search my bookmarks for React hooks
+
+Continue: Found 5 React Hooks bookmarks:
+1. React Hooks Documentation
+2. Custom Hooks Guide
+3. useEffect Deep Dive
+...
+```
+
+### With Amazon Q CLI
+
+```bash
 $ q chat
-Welcome to Amazon Q CLI!
 
-> Save this article: https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html
+> Save these AWS Lambda docs in my serverless category:
+> https://docs.aws.amazon.com/lambda/
 
-I'll analyze that article for you. One moment...
-
-I've analyzed the article and it appears to be about AWS Lambda Function URLs.
-Would you like me to save it with the following details?
-- Category: Serverless
-- Tags: lambda, api, function-urls, http-endpoints
-- Description: Documentation on how to create and configure function URLs to provide dedicated HTTP(S) endpoints for Lambda functions.
-- Importance: 4 (High)
-
-> Yes, that looks good
-
-Great! I've saved the article to your bookmarks.
-
-> Show me my Chrome bookmarks about AWS
-
-I'll check your Chrome bookmarks for AWS-related content.
-
-Found 12 bookmarks related to AWS across your Chrome profiles:
-1. AWS Management Console
-   URL: https://console.aws.amazon.com/
-   Profile: Work/Bookmarks Bar
-
-2. Amazon EC2 Documentation
-   URL: https://docs.aws.amazon.com/ec2/
-   Profile: Work/AWS Documentation
-
-[...more results...]
-
-Would you like me to import any of these into your Retromark collection?
-
-> Import the first one into my AWS category
-
-I've imported "AWS Management Console" into your AWS category with tags: aws, console, management.
+Analyzing and saving...
+Bookmark saved in "serverless" category!
 ```
 
-## MCP Tool Reference
+## MCP Tools
 
-### get_url_data
+Retromark exposes 8 tools through the MCP protocol:
 
-```python
-def get_url_data(url: str) -> Dict[str, Any]:
-    """
-    Fetch and extract data from a URL.
-    
-    Args:
-        url: The URL to fetch and analyze
-        
-    Returns:
-        A dictionary containing extracted data from the URL
-    """
-```
-
-### store_url
-
-```python
-def store_url(url: str, title: str, category: str, 
-              tags: List[str], description: str, 
-              importance: int, notes: str = None) -> Dict[str, Any]:
-    """
-    Store a URL with AI-generated metadata.
-    
-    Args:
-        url: The URL to store
-        title: The title of the webpage
-        category: The category to assign
-        tags: List of tags to associate with the URL
-        description: A brief description of the content
-        importance: Importance rating (1-5)
-        notes: Optional additional notes or comments about the URL
-        
-    Returns:
-        A dictionary indicating success or failure
-    """
-```
-
-### search_bookmarks
-
-```python
-def search_bookmarks(query: str) -> Dict[str, Any]:
-    """
-    Search for bookmarks by query.
-    
-    Args:
-        query: The search query
-        
-    Returns:
-        A dictionary containing search results
-    """
-```
-
-### list_categories
-
-```python
-def list_categories() -> Dict[str, Any]:
-    """
-    List all bookmark categories.
-    
-    Returns:
-        A dictionary containing all categories and their counts
-    """
-```
-
-### list_bookmarks_by_category
-
-```python
-def list_bookmarks_by_category(category: str) -> Dict[str, Any]:
-    """
-    List all bookmarks in a specific category.
-    
-    Args:
-        category: The category name
-        
-    Returns:
-        A dictionary containing bookmarks in the specified category
-    """
-```
-
-### delete_bookmark
-
-```python
-def delete_bookmark(url: str, category: str = None) -> Dict[str, Any]:
-    """
-    Delete a bookmark from the database.
-    
-    Args:
-        url: The URL of the bookmark to delete
-        category: Optional category to specify which bookmark to delete if the same URL exists in multiple categories
-        
-    Returns:
-        A dictionary indicating success or failure and details about the deleted bookmark
-    """
-```
-
-### list_chrome_bookmarks
-
-```python
-def list_chrome_bookmarks(folder: str = None) -> Dict[str, Any]:
-    """
-    List Chrome bookmarks, optionally filtered by folder.
-    
-    Args:
-        folder: Optional folder path to filter bookmarks
-        
-    Returns:
-        A dictionary containing Chrome bookmarks
-    """
-```
-
-### import_chrome_bookmark
-
-```python
-def import_chrome_bookmark(url: str, title: str, category: str, 
-                          tags: List[str], description: str = "", 
-                          importance: int = 3, notes: str = None) -> Dict[str, Any]:
-    """
-    Import a Chrome bookmark into the database.
-    
-    Args:
-        url: The URL of the Chrome bookmark to import
-        title: The title of the bookmark
-        category: The category to assign
-        tags: List of tags to associate with the URL
-        description: A brief description of the content
-        importance: Importance rating (1-5)
-        notes: Optional additional notes or comments about the URL
-        
-    Returns:
-        A dictionary indicating success or failure
-    """
-```
+| Tool | Description |
+|------|-------------|
+| `get_url_data` | Fetch and analyze webpage content |
+| `store_url` | Save bookmark with AI-generated metadata |
+| `search_bookmarks` | Full-text search across all bookmarks |
+| `list_categories` | List all bookmark categories |
+| `list_bookmarks_by_category` | Get bookmarks in a category |
+| `delete_bookmark` | Remove a bookmark |
+| `list_chrome_bookmarks` | List Chrome bookmarks from all profiles |
+| `import_chrome_bookmark` | Import Chrome bookmark into Retromark |
 
 ## Data Storage
 
-Retromark stores bookmarks in an SQLite database at `~/Documents/github/retromark-mcp-server/data/bookmarks.db`
+- **MCP Mode**: SQLite database at `~/Documents/github/retromark-mcp-server/data/bookmarks.db`
+- **CLI Mode**: JSON file at `~/Documents/github/retromark-mcp-server/data/url_database.json`
 
-## Development
+**Note**: MCP and CLI modes use separate storage and do not sync.
 
-### Requirements
+## Additional Features
 
-- Python 3.10+
-- Dependencies in pyproject.toml:
-  - beautifulsoup4
-  - fastapi
-  - fastmcp
-  - mcp
-  - requests
+### Standalone CLI Mode
+
+In addition to MCP server mode, Retromark provides a standalone CLI:
+
+```bash
+./main.py --mode cli
+# or
+./src/url_manager.py <command> [options]
+```
+
+**CLI Commands**:
+- `add <url> <category>` - Add bookmark
+- `search <query>` - Search bookmarks
+- `list <category>` - List category bookmarks
+- `categories` - List all categories
+- `chrome [-f folder]` - List Chrome bookmarks
+- `import <url> <category>` - Import Chrome bookmark
+
+See `./src/url_manager.py --help` for full CLI documentation.
+
+## Documentation
+
+- **Setup Guides**
+  - [Claude Desktop & Claude Code](docs/claude-setup.md)
+  - [Continue.dev](docs/continue-setup.md)
+  - [Amazon Q CLI](docs/amazonq-setup.md)
+
+- **Reference**
+  - [Client Comparison](docs/client-comparison.md) - Which client to use
+  - [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
+  - [CHANGELOG](CHANGELOG.md) - Version history
+
+## Requirements
+
+- Python 3.10+ (3.13 recommended)
+- One of: Claude Desktop, Continue.dev, Amazon Q CLI, or any MCP client
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
 
 ## Project Structure
 
 ```
 retromark-mcp-server/
-├── src/                    # Source code directory
-│   ├── __init__.py         # Package initialization
+├── src/                    # Source code
 │   ├── server.py           # MCP server implementation
 │   ├── url_manager.py      # CLI implementation
-│   └── utils/              # Utility functions
-│       ├── __init__.py
-│       └── browser_integration.py  # Browser integration utilities
-├── data/                   # Database storage
-├── main.py                 # Main entry point
-├── README.md               # This file
-├── CHANGELOG.md            # Version history
-└── pyproject.toml          # Project dependencies
+│   └── utils/              # Utilities
+│       └── browser_integration.py
+├── docs/                   # Documentation
+│   ├── claude-setup.md
+│   ├── continue-setup.md
+│   ├── amazonq-setup.md
+│   ├── client-comparison.md
+│   └── troubleshooting.md
+├── data/                   # Databases (gitignored)
+├── main.py                 # Entry point
+├── pyproject.toml          # Dependencies
+└── README.md               # This file
 ```
 
-## Additional Features
+## Development
 
-### CLI Mode
+### Running Tests
 
-In addition to the MCP integration with Amazon Q CLI, Retromark also provides a standalone CLI interface for direct bookmark management.
+```bash
+# Test MCP server manually
+uv run src/server.py
 
-```
+# Test CLI mode
 ./main.py --mode cli
 ```
 
-Or directly:
+### Tech Stack
 
-```
-./src/url_manager.py <command> [options]
-```
+- **FastMCP**: MCP server framework
+- **BeautifulSoup4**: HTML parsing
+- **SQLite**: Database storage
+- **Requests**: HTTP client
 
-#### CLI Commands
+## Troubleshooting
 
-- **Add a URL**: `add <url> <category> [-t tags] [-n notes] [--title custom_title]`
-- **List Categories**: `categories`
-- **List URLs in Category**: `list <category>`
-- **Search URLs**: `search <query>`
-- **List Tags**: `tags`
-- **List URLs with Tag**: `tag <tag>`
-- **Delete URL**: `delete <url> [-c category]`
-- **Rename Category**: `rename <old_name> <new_name>`
-- **Delete Category**: `delcat <category>`
-- **List Chrome Bookmarks**: `chrome [-f folder]`
-- **Import Chrome Bookmark**: `import <url> <category> [-t tags] [--title title]`
+**Server won't start?**
+→ Check configuration paths are absolute
+→ Verify Python/uv in PATH
+→ See [Troubleshooting Guide](docs/troubleshooting.md)
 
-### CLI Data Storage
+**Tools not appearing?**
+→ Restart your MCP client completely
+→ Validate JSON configuration syntax
+→ Check client logs
 
-The CLI mode uses a JSON file for storage at `~/Documents/github/retromark-mcp-server/data/url_database.json`
+**Permission errors?**
+→ Run `chmod +x src/server.py`
+→ Verify data directory is writable
+
+**Full troubleshooting guide**: [docs/troubleshooting.md](docs/troubleshooting.md)
+
+## Contributing
+
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## Credits
 
-This project is a fork of [LinkVault MCP Server](https://github.com/labeveryday/linkvault-mcp-server) by [@labeveryday](https://github.com/labeveryday). Special thanks for creating the original implementation and foundational architecture.
+This project is a fork of [LinkVault MCP Server](https://github.com/labeveryday/linkvault-mcp-server) by [@labeveryday](https://github.com/labeveryday). Special thanks for creating the original implementation.
 
 ## License
 
-MIT License
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/cearley/retromark-mcp-server/issues)
+- **Documentation**: [/docs](docs/)
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
+
+---
+
+**Version 0.2.0** - Universal MCP client support
+**Made with** ❤️ **for the MCP community**
