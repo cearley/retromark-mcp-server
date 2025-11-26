@@ -1,11 +1,20 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- Rebranded from LinkVault to Retromark
+- Updated all documentation and code references
+- Changed package name to retromark-mcp-server
+- Updated database paths to use retromark-mcp-server directory
+- Configured as a proper uv project with Python 3.13 support
+
 ## [1.1.0] - 2025-05-28
 
 ### Added
 - Chrome bookmark integration
   - Support for listing Chrome bookmarks across all profiles
-  - Import Chrome bookmarks into LinkVault
+  - Import Chrome bookmarks into Retromark
   - Filter bookmarks by folder path
   - Cross-platform support (macOS, Windows, Linux)
 
@@ -28,7 +37,7 @@
 ## [1.0.0] - 2025-05-28
 
 ### Added
-- Initial release of LinkVault MCP Server
+- Initial release of Retromark MCP Server (originally LinkVault)
 - CLI interface with JSON storage
 - MCP server with SQLite storage
 - Content extraction from web pages

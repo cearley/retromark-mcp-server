@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LinkVault MCP Server - Main entry point
+Retromark MCP Server - Main entry point
 """
 
 import os
@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 def start_mcp_server():
     """Start the MCP server for bookmark management."""
     from src.server import app
-    print("Starting LinkVault MCP Server...")
+    print("Starting Retromark MCP Server...")
     app.run()
 
 def start_cli():
@@ -22,8 +22,8 @@ def start_cli():
     url_manager_main()
 
 def main():
-    """Main entry point for the LinkVault MCP Server."""
-    parser = argparse.ArgumentParser(description="LinkVault MCP Server")
+    """Main entry point for the Retromark MCP Server."""
+    parser = argparse.ArgumentParser(description="Retromark MCP Server")
     parser.add_argument("--mode", choices=["cli", "mcp"], default="cli",
                         help="Mode to run (cli or mcp)")
     

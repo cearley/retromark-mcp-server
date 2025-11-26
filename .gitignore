@@ -25,6 +25,9 @@ build/
 *.swp
 *.swo
 
+# AI Assistant files
+.serena/
+
 # OS files
 .DS_Store
 Thumbs.db

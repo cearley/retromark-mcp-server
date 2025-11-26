@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LinkVault - A tool to categorize, store, and search web URLs for research and learning.
+Retromark - A tool to categorize, store, and search web URLs for research and learning.
 """
 
 import json
@@ -199,7 +199,7 @@ def import_chrome_bookmark(url: str, title: str, category: str, tags: List[str] 
 
 def main():
     """Main entry point for the CLI."""
-    parser = argparse.ArgumentParser(description="LinkVault CLI")
+    parser = argparse.ArgumentParser(description="Retromark CLI")
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
     
     # Add URL command

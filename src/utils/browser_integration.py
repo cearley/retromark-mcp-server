@@ -1,5 +1,5 @@
 """
-Browser integration utilities for LinkVault.
+Browser integration utilities for Retromark.
 
 This module provides functions to interact with browser bookmarks,
 currently supporting Chrome on Windows, macOS, and Linux.

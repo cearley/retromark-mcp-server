@@ -1,14 +1,10 @@
-# LinkVault MCP Server
+# Retromark MCP Server
 
 A tool for extending Amazon Q CLI with AI-assisted bookmark management capabilities.
 
-<p align="center">
-  <img src="./img/logo.png" alt="LinkVault Logo" width="100%">
-</p>
-
 ## Overview
 
-LinkVault is an MCP (Model Context Protocol) server that integrates with Amazon Q CLI to provide intelligent bookmark management through natural language. It allows you to access, organize, and search your bookmarks using conversational commands in your terminal.
+Retromark is an MCP (Model Context Protocol) server that integrates with Amazon Q CLI to provide intelligent bookmark management through natural language. It allows you to access, organize, and search your bookmarks using conversational commands in your terminal.
 
 ## Key Features
 
@@ -20,19 +16,47 @@ LinkVault is an MCP (Model Context Protocol) server that integrates with Amazon 
 
 ## Installation
 
-1. Make sure you have Python 3.10+ installed
-2. Install required packages:
+### Prerequisites
+
+- Python 3.10+ (Python 3.13 recommended)
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
+
+### Using uv (Recommended)
+
+1. Install uv if you haven't already:
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
+
+2. Clone the repository and install dependencies:
+   ```bash
+   git clone https://github.com/cearley/retromark-mcp-server.git
+   cd retromark-mcp-server
+   uv sync
+   ```
+
+3. Make the scripts executable:
+   ```bash
+   chmod +x main.py src/url_manager.py src/server.py
+   ```
+
+### Using pip (Alternative)
+
+1. Make sure you have Python 3.10+ installed
+
+2. Install required packages:
+   ```bash
    pip install -r requirements.txt
    ```
+
 3. Make the scripts executable:
-   ```
+   ```bash
    chmod +x main.py src/url_manager.py src/server.py
    ```
 
 ## Amazon Q CLI Setup
 
-To use LinkVault with Amazon Q CLI, you need to register it as an MCP server:
+To use Retromark with Amazon Q CLI, you need to register it as an MCP server:
 
 1. Edit the MCP configuration file:
    ```
@@ -43,30 +67,30 @@ To use LinkVault with Amazon Q CLI, you need to register it as an MCP server:
    ```json
    "bookmark_manager": {
      "command": "uv",
-     "args": ["--directory", "/path/to/linkvault-mcp-server", "run", "src/server.py"],
+     "args": ["--directory", "/path/to/retromark-mcp-server", "run", "src/server.py"],
      "env": {},
      "disabled": false,
      "autoApprove": ["get_url_data", "store_url", "search_bookmarks", "list_categories", "list_bookmarks_by_category", "delete_bookmark", "list_chrome_bookmarks", "import_chrome_bookmark"]
    }
    ```
 
-3. Replace `/path/to/linkvault-mcp-server` with the actual path to your installation directory.
+3. Replace `/path/to/retromark-mcp-server` with the actual path to your installation directory.
 
 4. Save the file and restart Amazon Q CLI if it's already running.
 
 ## MCP Architecture
 
-LinkVault uses the Model Context Protocol to extend Amazon Q CLI with bookmark management capabilities:
+Retromark uses the Model Context Protocol to extend Amazon Q CLI with bookmark management capabilities:
 
 ```mermaid
 graph TD
     User[User] -->|Natural Language| AQ[Amazon Q CLI]
-    AQ -->|MCP Protocol| MCP[LinkVault MCP Server]
+    AQ -->|MCP Protocol| MCP[Retromark MCP Server]
     MCP -->|SQLite Storage| SQL[(SQLite Database)]
     MCP -->|Extract Content| Web[Web Pages]
     MCP -->|Read Bookmarks| Chrome[Chrome Profiles]
-    
-    subgraph LinkVault
+
+    subgraph Retromark
         MCP
     end
 ```
@@ -77,7 +101,7 @@ graph TD
 sequenceDiagram
     participant User
     participant AQ as Amazon Q CLI
-    participant MCP as LinkVault MCP Server
+    participant MCP as Retromark MCP Server
     participant Web as Web Pages
     participant DB as SQLite Database
     participant Chrome as Chrome Bookmarks
@@ -105,7 +129,7 @@ sequenceDiagram
 
 ## Browser Integration
 
-LinkVault can access bookmarks from all Chrome profiles on your system:
+Retromark can access bookmarks from all Chrome profiles on your system:
 
 ```mermaid
 flowchart TD
@@ -162,7 +186,7 @@ Found 12 bookmarks related to AWS across your Chrome profiles:
 
 [...more results...]
 
-Would you like me to import any of these into your LinkVault collection?
+Would you like me to import any of these into your Retromark collection?
 
 > Import the first one into my AWS category
 
@@ -307,7 +331,7 @@ def import_chrome_bookmark(url: str, title: str, category: str,
 
 ## Data Storage
 
-LinkVault stores bookmarks in an SQLite database at `~/Documents/github/linkvault-mcp-server/data/bookmarks.db`
+Retromark stores bookmarks in an SQLite database at `~/Documents/github/retromark-mcp-server/data/bookmarks.db`
 
 ## Development
 
@@ -324,7 +348,7 @@ LinkVault stores bookmarks in an SQLite database at `~/Documents/github/linkvaul
 ## Project Structure
 
 ```
-linkvault-mcp-server/
+retromark-mcp-server/
 ├── src/                    # Source code directory
 │   ├── __init__.py         # Package initialization
 │   ├── server.py           # MCP server implementation
@@ -343,7 +367,7 @@ linkvault-mcp-server/
 
 ### CLI Mode
 
-In addition to the MCP integration with Amazon Q CLI, LinkVault also provides a standalone CLI interface for direct bookmark management.
+In addition to the MCP integration with Amazon Q CLI, Retromark also provides a standalone CLI interface for direct bookmark management.
 
 ```
 ./main.py --mode cli
@@ -371,7 +395,11 @@ Or directly:
 
 ### CLI Data Storage
 
-The CLI mode uses a JSON file for storage at `~/Documents/github/linkvault-mcp-server/data/url_database.json`
+The CLI mode uses a JSON file for storage at `~/Documents/github/retromark-mcp-server/data/url_database.json`
+
+## Credits
+
+This project is a fork of [LinkVault MCP Server](https://github.com/labeveryday/linkvault-mcp-server) by [@labeveryday](https://github.com/labeveryday). Special thanks for creating the original implementation and foundational architecture.
 
 ## License
 

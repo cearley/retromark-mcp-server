@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LinkVault MCP Server
+Retromark MCP Server
 
 This is an MCP server for bookmark management.
 It provides tools for URL content extraction and bookmark storage.
@@ -27,7 +27,7 @@ except ImportError:
         return {"success": False, "error": "Browser integration module not available", "bookmarks": []}
 
 # Database setup
-DB_PATH = os.path.expanduser("~/Documents/github/linkvault-mcp-server/data/bookmarks.db")
+DB_PATH = os.path.expanduser("~/Documents/github/retromark-mcp-server/data/bookmarks.db")
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 def init_db():
@@ -80,7 +80,7 @@ def init_db():
 init_db()
 
 # Create MCP server
-app = FastMCP(name="bookmark_manager", description="LinkVault - A tool for managing bookmarks")
+app = FastMCP(name="bookmark_manager", description="Retromark - A tool for managing bookmarks")
 
 @app.tool("get_url_data")
 def get_url_data(url: str) -> Dict[str, Any]:
@@ -673,6 +673,6 @@ def import_chrome_bookmark(url: str, title: str, category: str,
 
 if __name__ == "__main__":
     # Start the MCP server
-    print("Starting LinkVault MCP Server...")
+    print("Starting Retromark MCP Server...")
     print(f"Database path: {DB_PATH}")
     app.run()
